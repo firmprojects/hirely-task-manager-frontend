@@ -27,6 +27,7 @@ export function TasksPage() {
     setIsFormOpen,
     setSelectedTask,
     setIsEditing,
+    selectedTask,
   });
 
   const openEditForm = (task: Task) => {
