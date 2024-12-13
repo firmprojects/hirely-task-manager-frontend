@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',  // Changed to local development server
+  baseURL: 'https://hirely-task-manager-backend.vercel.app/api/users',  // Changed to local development server
   headers: {
     'Content-Type': 'application/json',
   },
