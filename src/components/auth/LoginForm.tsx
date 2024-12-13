@@ -11,12 +11,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
-  const { login } = useAuth();
   const { toast } = useToast();
+  const { signInWithGoogle, signInWithEmail } = useAuth();
+  const navigate = useNavigate();
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -26,19 +28,21 @@ export function LoginForm() {
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    // Simulate API call
-    setTimeout(() => {
-      login({
-        id: "1",
-        name: "John Doe",
-        email: data.email,
-      });
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await signInWithEmail(data.email, data.password);
       toast({
         title: "Success",
         description: "You have been logged in successfully.",
       });
-    }, 1000);
+      navigate('/tasks');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to login",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -73,7 +77,39 @@ export function LoginForm() {
         />
 
         <Button type="submit" className="w-full">
-          Login
+          Login with Email
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="w-full"
+          onClick={() => {
+            signInWithGoogle()
+              .then(() => {
+                navigate('/tasks');
+              })
+              .catch((error) => {
+                toast({
+                  title: "Error",
+                  description: error.message || "Failed to login with Google",
+                  variant: "destructive",
+                });
+              });
+          }}
+        >
+          Continue with Google
         </Button>
       </form>
     </Form>

@@ -2,9 +2,15 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/auth-context";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthLayout

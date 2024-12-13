@@ -1,10 +1,25 @@
 import axios from 'axios';
+import { auth } from './firebase';
 
 export const api = axios.create({
   baseURL: 'https://hirely-task-manager-backend.vercel.app',
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Add auth token to requests
+api.interceptors.request.use(async (config) => {
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken();
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.error('Error getting auth token:', error);
+  }
+  return config;
 });
 
 // Add request interceptor for logging requests
