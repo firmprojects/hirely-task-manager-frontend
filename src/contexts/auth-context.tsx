@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log('Creating user in database:', user.displayName);
 
     try {
-      await api.post('api/users', {
+      await api.post('/api/users', {
         id: user.uid,
         email: user.email,
         name: user.displayName,
