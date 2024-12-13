@@ -4,6 +4,7 @@ import { TaskList } from "@/components/TaskList";
 import { SearchBar } from "@/components/SearchBar";
 import { DeleteTaskDialog } from "@/components/DeleteTaskDialog";
 import { TaskFormDialog } from "@/components/dialogs/TaskFormDialog";
+import { EditTaskDialog } from "@/components/dialogs/EditTaskDialog";
 import { TaskDetailsDialog } from "@/components/dialogs/TaskDetailsDialog";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -17,9 +18,9 @@ export function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -47,15 +48,14 @@ export function TasksPage() {
     setTasks,
     setIsFormOpen,
     setSelectedTask,
-    setIsEditing,
+    setIsEditOpen,
     setIsDeleteDialogOpen,
     selectedTask,
   });
 
   const openEditForm = (task: Task) => {
     setSelectedTask(task);
-    setIsEditing(true);
-    setIsFormOpen(true);
+    setIsEditOpen(true);
   };
 
   const openDeleteDialog = (task: Task) => {
@@ -70,7 +70,11 @@ export function TasksPage() {
 
   const handleFormCancel = () => {
     setIsFormOpen(false);
-    setIsEditing(false);
+    setSelectedTask(null);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditOpen(false);
     setSelectedTask(null);
   };
 
@@ -111,11 +115,19 @@ export function TasksPage() {
       <TaskFormDialog
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
-        isEditing={isEditing}
-        selectedTask={selectedTask || undefined}
-        onSubmit={isEditing ? handleUpdateTask : handleCreateTask}
+        onSubmit={handleCreateTask}
         onCancel={handleFormCancel}
       />
+
+      {selectedTask && (
+        <EditTaskDialog
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          task={selectedTask}
+          onSubmit={handleUpdateTask}
+          onCancel={handleEditCancel}
+        />
+      )}
 
       <TaskDetailsDialog
         open={isDetailsOpen}

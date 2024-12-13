@@ -25,24 +25,26 @@ import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface TaskFormProps {
+interface EditTaskFormProps {
+  task: Task;
   onSubmit: (data: Task) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
 }
 
-export function TaskForm({ 
+export function EditTaskForm({ 
+  task, 
   onSubmit, 
   onCancel, 
   isSubmitting 
-}: TaskFormProps) {
+}: EditTaskFormProps) {
   const form = useForm<Task>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      dueDate: new Date(),
-      status: "TODO",
+      title: task.title,
+      description: task.description,
+      dueDate: new Date(task.dueDate),
+      status: task.status,
     },
   });
 
@@ -152,7 +154,7 @@ export function TaskForm({
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Task
+            Update Task
           </Button>
         </div>
       </form>
