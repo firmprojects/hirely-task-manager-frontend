@@ -1,5 +1,6 @@
 import { Task } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
 
 interface UseTaskActionsProps {
   tasks: Task[];
@@ -22,42 +23,71 @@ export function useTaskActions({
 }: UseTaskActionsProps) {
   const { toast } = useToast();
 
-  const handleCreateTask = (data: Task) => {
-    const newTask = { ...data, id: crypto.randomUUID() };
-    setTasks([...tasks, newTask]);
-    setIsFormOpen(false);
-    toast({
-      title: "Task created",
-      description: "Your task has been created successfully.",
-    });
+  const handleCreateTask = async (data: Task) => {
+    try {
+      const response = await api.post<Task>('/tasks', data);
+      const newTask = response.data;
+      setTasks([...tasks, newTask]);
+      setIsFormOpen(false);
+      toast({
+        title: "Task created",
+        description: "Your task has been created successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateTask = (data: Task) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === data.id ? { ...data } : task
-    );
-    setTasks(updatedTasks);
-    setIsFormOpen(false);
-    setSelectedTask(null);
-    setIsEditing(false);
-    toast({
-      title: "Task updated",
-      description: "Your task has been updated successfully.",
-    });
+  const handleUpdateTask = async (data: Task) => {
+    try {
+      const response = await api.put<Task>(`/tasks/${data.id}`, data);
+      const updatedTask = response.data;
+      const updatedTasks = tasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      );
+      setTasks(updatedTasks);
+      setIsFormOpen(false);
+      setSelectedTask(null);
+      setIsEditing(false);
+      toast({
+        title: "Task updated",
+        description: "Your task has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteTask = () => {
+  const handleDeleteTask = async () => {
     if (!selectedTask) return;
     
-    setTasks((prevTasks) => 
-      prevTasks.filter((task) => task.id !== selectedTask.id)
-    );
-    setSelectedTask(null);
-    setIsDeleteDialogOpen?.(false);
-    toast({
-      title: "Task deleted",
-      description: "Your task has been deleted successfully.",
-    });
+    try {
+      await api.delete(`/tasks/${selectedTask.id}`);
+      const updatedTasks = tasks.filter((task) => task.id !== selectedTask.id);
+      setTasks(updatedTasks);
+      setSelectedTask(null);
+      if (setIsDeleteDialogOpen) {
+        setIsDeleteDialogOpen(false);
+      }
+      toast({
+        title: "Task deleted",
+        description: "Your task has been deleted successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete task. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return {

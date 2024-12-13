@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Task } from "@/lib/types";
 import { TaskList } from "@/components/TaskList";
 import { SearchBar } from "@/components/SearchBar";
@@ -10,6 +10,8 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useTaskActions } from "@/lib/hooks/useTaskActions";
 import { useTaskSearch } from "@/lib/hooks/useTaskSearch";
 import { ListXIcon } from "lucide-react";
+import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,6 +20,25 @@ export function TasksPage() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await api.get<Task[]>('api/tasks');
+        setTasks(response.data);
+      } catch (error: any) {
+        console.error('Failed to fetch tasks:', error);
+        toast({
+          title: "Error fetching tasks",
+          description: error.response?.data?.message || "Failed to fetch tasks. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    fetchTasks();
+  }, [toast]);
   
   const { searchQuery, setSearchQuery, filteredTasks } = useTaskSearch(tasks);
   
