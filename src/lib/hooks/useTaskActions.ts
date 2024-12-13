@@ -7,6 +7,7 @@ interface UseTaskActionsProps {
   setIsFormOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedTask: React.Dispatch<React.SetStateAction<Task | null>>;
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedTask: Task | null;
 }
 
 export function useTaskActions({
@@ -15,6 +16,7 @@ export function useTaskActions({
   setIsFormOpen,
   setSelectedTask,
   setIsEditing,
+  selectedTask,
 }: UseTaskActionsProps) {
   const { toast } = useToast();
 
@@ -43,8 +45,10 @@ export function useTaskActions({
   };
 
   const handleDeleteTask = () => {
+    if (!selectedTask) return;
+    
     setTasks((currentTasks) => 
-      currentTasks.filter((task) => task.id !== selectedTask?.id)
+      currentTasks.filter((task) => task.id !== selectedTask.id)
     );
     toast({
       title: "Task deleted",
