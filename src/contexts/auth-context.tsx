@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: user.email,
         name: user.displayName,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating user in database:', error);
       // If it's a 409 Conflict error, the user already exists, which is fine
       if (error.response?.status !== 409) {
