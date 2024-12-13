@@ -27,6 +27,7 @@ export function TasksPage() {
     setIsFormOpen,
     setSelectedTask,
     setIsEditing,
+    setIsDeleteDialogOpen,
     selectedTask,
   });
 
