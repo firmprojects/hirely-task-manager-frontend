@@ -11,13 +11,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/authStore";
 
 export function LoginForm() {
   const { toast } = useToast();
-  const { signInWithGoogle, signInWithEmail } = useAuth();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
   
   const form = useForm<LoginFormData>({
@@ -30,16 +30,28 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signInWithEmail(data.email, data.password);
+      await login(data.email, data.password);
       toast({
         title: "Success",
         description: "You have been logged in successfully.",
       });
       navigate('/tasks');
     } catch (error: any) {
+      let errorMessage = "Failed to login";
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = "Incorrect password. Please try again.";
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = "No user found with this email.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email address. Please try again.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Too many login attempts. Please try again later.";
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = "Network request failed. Please try again later.";
+      }
       toast({
         title: "Error",
-        description: error.message || "Failed to login",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -96,17 +108,7 @@ export function LoginForm() {
           variant="outline" 
           className="w-full"
           onClick={() => {
-            signInWithGoogle()
-              .then(() => {
-                navigate('/tasks');
-              })
-              .catch((error) => {
-                toast({
-                  title: "Error",
-                  description: error.message || "Failed to login with Google",
-                  variant: "destructive",
-                });
-              });
+            // Removed the Google login functionality
           }}
         >
           Continue with Google

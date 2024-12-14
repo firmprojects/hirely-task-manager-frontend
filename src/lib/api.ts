@@ -2,7 +2,7 @@ import axios from 'axios';
 import { auth } from './firebase';
 
 export const api = axios.create({
-  baseURL: 'https://hirely-task-manager-backend.vercel.app',
+  baseURL: 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },

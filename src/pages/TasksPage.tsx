@@ -13,6 +13,8 @@ import { useTaskSearch } from "@/lib/hooks/useTaskSearch";
 import { ListXIcon } from "lucide-react";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 export function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -22,8 +24,18 @@ export function TasksPage() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+
   useEffect(() => {
+    if (!userId) {
+      // Redirect to login if no user ID
+      navigate('/login');
+      return;
+    }
+    
     const fetchTasks = async () => {
       try {
         const response = await api.get<Task[]>('api/tasks');
@@ -39,7 +51,7 @@ export function TasksPage() {
     };
     
     fetchTasks();
-  }, [toast]);
+  }, [userId, toast]);
   
   const { searchQuery, setSearchQuery, filteredTasks } = useTaskSearch(tasks);
   
@@ -51,6 +63,7 @@ export function TasksPage() {
     setIsEditOpen,
     setIsDeleteDialogOpen,
     selectedTask,
+    userId,
   });
 
   const openEditForm = (task: Task) => {

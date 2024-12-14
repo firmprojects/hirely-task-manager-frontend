@@ -2,11 +2,11 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuthStore } from "@/stores/authStore";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { loading } = useAuth();
+  const { loading } = useAuthStore(state => ({ loading: state.loading }));
 
   if (loading) {
     return <div>Loading...</div>;

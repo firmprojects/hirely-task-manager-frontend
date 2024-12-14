@@ -11,14 +11,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/stores/authStore";
+import { updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  onRegister: (email: string, password: string) => Promise<void>;
+}
+
+export function RegisterForm({ onRegister }: RegisterFormProps) {
   const { toast } = useToast();
-  const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
   
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -32,46 +37,33 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      await updateProfile(userCredential.user, {
-        displayName: data.name
-      });
+      await onRegister(data.email, data.password);
       
-      // Get the Firebase ID token
-      const idToken = await userCredential.user.getIdToken();
-      
-      // Create user in backend database
-      const response = await fetch('https://task-backend-liart.vercel.app/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`
-        },
-        body: JSON.stringify({
-          id: userCredential.user.uid,
-          email: data.email,
-          name: data.name
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Backend error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData
+      // Update user profile with name
+      const user = auth.currentUser;
+      if (user) {
+        await updateProfile(user, {
+          displayName: data.name
         });
-        throw new Error(`Backend error: ${errorData.error || response.statusText}`);
       }
       
       toast({
         title: "Success",
         description: "Your account has been created successfully.",
       });
+      navigate('/tasks');
     } catch (error: any) {
+      let errorMessage = "Failed to create account";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already in use.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email address. Please try again.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password should be at least 6 characters.";
+      }
       toast({
         title: "Error",
-        description: error.message || "Failed to create account",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -138,34 +130,6 @@ export function RegisterForm() {
 
         <Button type="submit" className="w-full">
           Create Account
-        </Button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <Button 
-          type="button" 
-          variant="outline" 
-          className="w-full"
-          onClick={() => {
-            signInWithGoogle().catch((error) => {
-              toast({
-                title: "Error",
-                description: error.message || "Failed to register with Google",
-                variant: "destructive",
-              });
-            });
-          }}
-        >
-          Continue with Google
         </Button>
       </form>
     </Form>

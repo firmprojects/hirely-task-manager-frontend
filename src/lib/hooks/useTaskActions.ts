@@ -10,6 +10,7 @@ interface UseTaskActionsProps {
   setIsEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDeleteDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedTask: Task | null;
+  userId: string; // Add userId to props
 }
 
 export function useTaskActions({
@@ -20,6 +21,7 @@ export function useTaskActions({
   setIsEditOpen,
   setIsDeleteDialogOpen,
   selectedTask,
+  userId, // Add userId to destructured props
 }: UseTaskActionsProps) {
   const { toast } = useToast();
 
@@ -29,9 +31,11 @@ export function useTaskActions({
         title: data.title,
         description: data.description,
         dueDate: data.dueDate.toISOString(),
-        status: data.status
+        status: data.status,
+        userId: userId, // Add userId here
       };
       
+      console.log('Creating task with userId:', userId); // Log userId
       const response = await api.post<Task>('api/tasks', taskData);
       const newTask = response.data;
       
