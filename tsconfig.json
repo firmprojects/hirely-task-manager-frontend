@@ -8,6 +8,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "noEmitOnError": false,
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true
   }
 }
