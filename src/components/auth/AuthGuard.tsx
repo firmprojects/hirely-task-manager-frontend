@@ -1,22 +1,23 @@
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "next/router";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const router = useRouter();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user && router.pathname !== '/login') {
-      router.push('/login');
+    if (!loading && !user && location.pathname !== '/login') {
+      navigate('/login');
     }
-  }, [user, loading, router]);
+  }, [user, loading, navigate, location]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!user && router.pathname !== '/login') {
+  if (!user && location.pathname !== '/login') {
     return null;
   }
 
