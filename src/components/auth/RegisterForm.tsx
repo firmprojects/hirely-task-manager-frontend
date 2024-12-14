@@ -37,6 +37,33 @@ export function RegisterForm() {
         displayName: data.name
       });
       
+      // Get the Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+      
+      // Create user in backend database
+      const response = await fetch('https://task-backend-liart.vercel.app/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({
+          id: userCredential.user.uid,
+          email: data.email,
+          name: data.name
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Backend error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(`Backend error: ${errorData.error || response.statusText}`);
+      }
+      
       toast({
         title: "Success",
         description: "Your account has been created successfully.",
