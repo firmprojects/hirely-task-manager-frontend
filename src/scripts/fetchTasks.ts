@@ -22,7 +22,7 @@ const authInstance = auth.getAuth(app);
 
 async function fetchTasks() {
   try {
-    const API_URL = process.env.VITE_API_URL || 'https://kelly-task-manager.vercel.app';
+    const API_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://kelly-task-manager.vercel.app';
     console.log('Fetching tasks from:', `${API_URL}/tasks`);
 
     const response = await fetch(`${API_URL}/tasks`, {
