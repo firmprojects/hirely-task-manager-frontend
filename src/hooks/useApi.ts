@@ -6,7 +6,7 @@ interface FetchOptions extends RequestInit {
 
 export function useApi() {
   const user = useAuthStore((state) => state.user);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://kelly-task-manager.vercel.app/api';
 
   const fetchWithAuth = async (endpoint: string, options: FetchOptions = {}) => {
     if (!user) {

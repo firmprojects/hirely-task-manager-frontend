@@ -1,25 +1,28 @@
 import axios from 'axios';
-import { auth } from './firebase';
+import { getAuth } from 'firebase/auth';
+
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests
+// Add request interceptor to include Firebase token
 api.interceptors.request.use(async (config) => {
-  try {
-    const user = auth.currentUser;
-    if (user) {
-      const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  } catch (error) {
-    console.error('Error getting auth token:', error);
+  const auth = getAuth();
+  const user = auth.currentUser;
+  
+  if (user) {
+    const token = await user.getIdToken();
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 // Add request interceptor for logging requests

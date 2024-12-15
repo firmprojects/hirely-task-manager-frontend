@@ -1,6 +1,6 @@
 import { Task } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { api } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 
 interface UseTaskActionsProps {
   tasks: Task[];
@@ -10,7 +10,6 @@ interface UseTaskActionsProps {
   setIsEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDeleteDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   selectedTask: Task | null;
-  userId: string; // Add userId to props
 }
 
 export function useTaskActions({
@@ -21,9 +20,9 @@ export function useTaskActions({
   setIsEditOpen,
   setIsDeleteDialogOpen,
   selectedTask,
-  userId, // Add userId to destructured props
 }: UseTaskActionsProps) {
   const { toast } = useToast();
+  const { fetchWithAuth } = useApi();
 
   const handleCreateTask = async (data: Task) => {
     try {
@@ -32,12 +31,12 @@ export function useTaskActions({
         description: data.description,
         dueDate: data.dueDate.toISOString(),
         status: data.status,
-        userId: userId, // Add userId here
       };
       
-      console.log('Creating task with userId:', userId); // Log userId
-      const response = await api.post<Task>('api/tasks', taskData);
-      const newTask = response.data;
+      const newTask = await fetchWithAuth('/tasks', {
+        method: 'POST',
+        data: taskData,
+      });
       
       setTasks(prevTasks => [...prevTasks, newTask]);
       setIsFormOpen(false);
@@ -49,32 +48,34 @@ export function useTaskActions({
       console.error('Failed to create task:', error);
       toast({
         title: "Error creating task",
-        description: error.response?.data?.message || "Failed to create task. Please try again.",
+        description: error.message || "Failed to create task. Please try again.",
         variant: "destructive",
       });
-      throw error;
     }
   };
 
   const handleUpdateTask = async (data: Task) => {
     try {
-      if (!data.id) {
-        throw new Error("Task ID is required for update");
-      }
+      if (!selectedTask) return;
 
       const taskData = {
         title: data.title,
         description: data.description,
         dueDate: data.dueDate.toISOString(),
-        status: data.status
+        status: data.status,
       };
-      
-      const response = await api.put<Task>(`api/tasks/${data.id}`, taskData);
-      const updatedTask = response.data;
-      
-      setTasks(prevTasks => 
-        prevTasks.map(task => task.id === updatedTask.id ? updatedTask : task)
+
+      const updatedTask = await fetchWithAuth(`/tasks/${selectedTask.id}`, {
+        method: 'PUT',
+        data: taskData,
+      });
+
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === selectedTask.id ? updatedTask : task
+        )
       );
+      
       setIsEditOpen(false);
       setSelectedTask(null);
       toast({
@@ -85,23 +86,28 @@ export function useTaskActions({
       console.error('Failed to update task:', error);
       toast({
         title: "Error updating task",
-        description: error.response?.data?.message || "Failed to update task. Please try again.",
+        description: error.message || "Failed to update task. Please try again.",
         variant: "destructive",
       });
-      throw error;
     }
   };
 
   const handleDeleteTask = async () => {
-    if (!selectedTask?.id) return;
-    
     try {
-      await api.delete(`api/tasks/${selectedTask.id}`);
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== selectedTask.id));
-      setSelectedTask(null);
+      if (!selectedTask) return;
+
+      await fetchWithAuth(`/tasks/${selectedTask.id}`, {
+        method: 'DELETE',
+      });
+
+      setTasks(prevTasks =>
+        prevTasks.filter(task => task.id !== selectedTask.id)
+      );
+      
       if (setIsDeleteDialogOpen) {
         setIsDeleteDialogOpen(false);
       }
+      setSelectedTask(null);
       toast({
         title: "Task deleted",
         description: "Your task has been deleted successfully.",
@@ -110,10 +116,9 @@ export function useTaskActions({
       console.error('Failed to delete task:', error);
       toast({
         title: "Error deleting task",
-        description: error.response?.data?.message || "Failed to delete task. Please try again.",
+        description: error.message || "Failed to delete task. Please try again.",
         variant: "destructive",
       });
-      throw error;
     }
   };
 

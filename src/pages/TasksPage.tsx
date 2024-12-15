@@ -63,7 +63,6 @@ export function TasksPage() {
     setIsEditOpen,
     setIsDeleteDialogOpen,
     selectedTask,
-    userId: userId as string,
   });
 
   const openEditForm = (task: Task) => {
