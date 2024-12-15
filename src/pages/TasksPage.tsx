@@ -11,7 +11,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { useTaskActions } from "@/lib/hooks/useTaskActions";
 import { useTaskSearch } from "@/lib/hooks/useTaskSearch";
 import { ListXIcon } from "lucide-react";
-import { api } from "@/lib/api";
+import { useApi } from "@/hooks/useApi";
 import { useToast } from "@/hooks/use-toast";
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +25,7 @@ export function TasksPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { fetchWithAuth } = useApi();
   
   const auth = getAuth();
   const userId = auth.currentUser?.uid;
@@ -38,21 +39,21 @@ export function TasksPage() {
     
     const fetchTasks = async () => {
       try {
-        const response = await api.get<Task[]>('api/tasks');
-        setTasks(response.data);
+        const tasks = await fetchWithAuth('/tasks');
+        setTasks(tasks);
       } catch (error: any) {
         console.error('Failed to fetch tasks:', error);
         toast({
           title: "Error fetching tasks",
-          description: error.response?.data?.message || "Failed to fetch tasks. Please try again.",
+          description: error.message || "Failed to fetch tasks. Please try again.",
           variant: "destructive",
         });
       }
     };
-    
+
     fetchTasks();
-  }, [userId, toast]);
-  
+  }, [userId, fetchWithAuth, navigate, toast]);
+
   const { searchQuery, setSearchQuery, filteredTasks } = useTaskSearch(tasks);
   
   const { handleCreateTask, handleUpdateTask, handleDeleteTask } = useTaskActions({
