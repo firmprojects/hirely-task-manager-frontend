@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 interface AuthState {
   user: User | null;
   loading: boolean;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -18,9 +18,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
   setLoading: (loading) => set({ loading }),
 
-  register: async (email: string, password: string) => {
+  register: async (email: string, password: string, name: string) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Update the user's profile with their name
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, {
+          displayName: name
+        });
+        // Update the store with the updated user
+        set({ user: auth.currentUser });
+      }
     } catch (error) {
       throw error;
     }
@@ -28,9 +36,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Ensure we have the latest user data
+      set({ user: userCredential.user });
     } catch (error) {
-      console.error('Login failed:', error); // Log the error for debugging
+      console.error('Login failed:', error);
       throw error;
     }
   },

@@ -14,16 +14,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/authStore";
-import { updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 
-interface RegisterFormProps {
-  onRegister: (email: string, password: string) => Promise<void>;
-}
-
-export function RegisterForm({ onRegister }: RegisterFormProps) {
+export function RegisterForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { register } = useAuthStore();
   
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -37,16 +32,7 @@ export function RegisterForm({ onRegister }: RegisterFormProps) {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await onRegister(data.email, data.password);
-      
-      // Update user profile with name
-      const user = auth.currentUser;
-      if (user) {
-        await updateProfile(user, {
-          displayName: data.name
-        });
-      }
-      
+      await register(data.email, data.password, data.name);
       toast({
         title: "Success",
         description: "Your account has been created successfully.",

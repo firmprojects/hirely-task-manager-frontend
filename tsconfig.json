@@ -9,6 +9,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "module": "esnext",
     "noEmitOnError": false,
     "strict": false,
     "noImplicitAny": false,
