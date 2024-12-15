@@ -5,7 +5,7 @@ interface FetchOptions extends RequestInit {
   data?: any;
 }
 
-const API_URL = 'https://hirely-taskmanager-frontend.netlify.app';
+const API_URL = 'https://kelly-task-manager.vercel.app';
 
 export function useApi() {
   const user = useAuthStore((state) => state.user);
