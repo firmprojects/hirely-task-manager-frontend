@@ -1,9 +1,9 @@
-import { useAuth } from "@/contexts/auth-context";
+import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
