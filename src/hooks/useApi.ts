@@ -5,9 +5,10 @@ interface FetchOptions extends RequestInit {
   data?: any;
 }
 
+const API_URL = 'https://kelly-task-manager.vercel.app';
+
 export function useApi() {
   const user = useAuthStore((state) => state.user);
-  const API_URL = import.meta.env.VITE_API_URL || 'https://kelly-task-manager.vercel.app';
 
   const fetchWithAuth = useCallback(async (endpoint: string, options: FetchOptions = {}) => {
     if (!user) {
@@ -23,33 +24,61 @@ export function useApi() {
       const url = `${API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
       console.log('Fetching from URL:', url);
 
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
+      // Basic headers that work with CORS
+      const headers: HeadersInit = {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
       };
+
+      // Only add Content-Type for requests with body
+      if (options.data) {
+        headers['Content-Type'] = 'application/json';
+      }
 
       const config: RequestInit = {
         ...options,
-        headers,
-        mode: 'cors', // Keep CORS mode
+        headers: {
+          ...headers,
+          ...options.headers
+        },
+        mode: 'cors',
+        cache: 'no-cache',
+        referrerPolicy: 'no-referrer'
       };
 
       if (options.data) {
         config.body = JSON.stringify(options.data);
       }
 
+      console.log('Making request with config:', {
+        url,
+        method: config.method || 'GET',
+        headers: config.headers,
+        mode: config.mode
+      });
+
       const response = await fetch(url, config);
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorText = await response.text();
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`API Error (${response.status}): ${errorText || response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('Response data:', data);
+      return data;
     } catch (error) {
       console.error('Fetch error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('An unexpected error occurred while fetching data');
     }
-  }, [user, API_URL]);
+  }, [user]);
 
   return { fetchWithAuth };
 }

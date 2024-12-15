@@ -46,7 +46,7 @@ export function TasksPage() {
       setError(null);
       console.log('Current user:', user.email);
       console.log('Attempting to fetch tasks...');
-      const fetchedTasks = await fetchWithAuth('/tasks');
+      const fetchedTasks = await fetchWithAuth('/api/tasks');
       console.log('Tasks fetched successfully:', fetchedTasks);
       setTasks(fetchedTasks);
     } catch (error: any) {

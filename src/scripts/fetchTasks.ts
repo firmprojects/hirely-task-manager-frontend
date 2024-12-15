@@ -1,9 +1,3 @@
-const fetch = require('node-fetch');
-const dotenv = require('dotenv');
-
-// Load environment variables
-dotenv.config();
-
 // Your Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY,
