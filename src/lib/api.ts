@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://kelly-task-manager.vercel.app';
+const baseURL = import.meta.env.VITE_API_URL || 'https://hirely-taskmanager-frontend.netlify.app';
 
 export const api = axios.create({
   baseURL,
