@@ -65,7 +65,7 @@ export function useTaskActions({
         status: data.status,
       };
 
-      const updatedTask = await fetchWithAuth(`/tasks/${selectedTask.id}`, {
+      const updatedTask = await fetchWithAuth(`/api/tasks/${selectedTask.id}`, {
         method: 'PUT',
         data: taskData,
       });
@@ -96,7 +96,7 @@ export function useTaskActions({
     try {
       if (!selectedTask) return;
 
-      await fetchWithAuth(`/tasks/${selectedTask.id}`, {
+      await fetchWithAuth(`/api/tasks/${selectedTask.id}`, {
         method: 'DELETE',
       });
 
