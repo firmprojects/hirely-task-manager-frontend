@@ -56,6 +56,10 @@ export function EditTaskDialog({
     }
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -66,6 +70,7 @@ export function EditTaskDialog({
           task={task}
           onSubmit={handleSubmit}
           onCancel={onCancel}
+          onClose={handleClose}
           isSubmitting={isSubmitting}
         />
       </DialogContent>
