@@ -5,6 +5,7 @@ interface FetchOptions extends RequestInit {
   data?: any;
 }
 
+// const API_URL = 'http://localhost:3000';
 const API_URL = 'https://kelly-task-manager.vercel.app';
 
 export function useApi() {

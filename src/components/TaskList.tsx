@@ -62,9 +62,9 @@ export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
             <CardContent className="pt-6">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-semibold text-lg line-clamp-1 flex-1 mr-4">{task.title}</h3>
-                <Badge className={statusColor}>
+                {/* <Badge className={statusColor}>
                   {statusConfig.label}
-                </Badge>
+                </Badge> */}
               </div>
               <p className="text-muted-foreground line-clamp-2 mb-4 min-h-[3rem]">
                 {task.description}
