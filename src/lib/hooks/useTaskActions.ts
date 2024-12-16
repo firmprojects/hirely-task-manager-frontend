@@ -62,8 +62,13 @@ export function useTaskActions({
         title: data.title,
         description: data.description,
         dueDate: data.dueDate.toISOString(),
-        status: data.status,
+        status: data.status || 'PENDING',
       };
+
+      console.log('Updating task with data:', {
+        taskId: selectedTask.id,
+        taskData
+      });
 
       const updatedTask = await fetchWithAuth(`/api/tasks/${selectedTask.id}`, {
         method: 'PUT',
@@ -72,7 +77,7 @@ export function useTaskActions({
 
       setTasks(prevTasks =>
         prevTasks.map(task =>
-          task.id === selectedTask.id ? updatedTask : task
+          task.id === selectedTask.id ? { ...updatedTask, dueDate: new Date(updatedTask.dueDate) } : task
         )
       );
       
