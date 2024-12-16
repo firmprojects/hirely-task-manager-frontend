@@ -31,10 +31,10 @@ interface TaskFormProps {
   isSubmitting: boolean;
 }
 
-export function TaskForm({ 
-  onSubmit, 
-  onCancel, 
-  isSubmitting 
+export function TaskForm({
+  onSubmit,
+  onCancel,
+  isSubmitting
 }: TaskFormProps) {
   const form = useForm<Task>({
     resolver: zodResolver(taskSchema),
@@ -42,7 +42,7 @@ export function TaskForm({
       title: "",
       description: "",
       dueDate: new Date(),
-      status: "TODO",
+      status: "PENDING",
     },
   });
 
@@ -136,7 +136,7 @@ export function TaskForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="TODO">To Do</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
                   <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                   <SelectItem value="COMPLETED">Completed</SelectItem>
                 </SelectContent>

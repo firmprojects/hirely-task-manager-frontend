@@ -36,19 +36,33 @@ const getStatusConfig = (status: string) => {
   }
 };
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "PENDING":
+      return "bg-yellow-100 text-yellow-800";
+    case "IN_PROGRESS":
+      return "bg-blue-100 text-blue-800";
+    case "COMPLETED":
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {tasks.map((task) => {
         const statusConfig = getStatusConfig(task.status);
         const StatusIcon = statusConfig.icon;
+        const statusColor = getStatusColor(task.status);
 
         return (
           <Card key={task.id} className="group hover:shadow-lg transition-shadow duration-200">
             <CardContent className="pt-6">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-semibold text-lg line-clamp-1 flex-1 mr-4">{task.title}</h3>
-                <Badge className={statusConfig.color}>
+                <Badge className={statusColor}>
                   {statusConfig.label}
                 </Badge>
               </div>
