@@ -1,6 +1,7 @@
 import { Task } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useApi } from "@/hooks/useApi";
+import { useAuthStore } from "@/stores/authStore";
 
 interface UseTaskActionsProps {
   tasks: Task[];
@@ -23,6 +24,7 @@ export function useTaskActions({
 }: UseTaskActionsProps) {
   const { toast } = useToast();
   const { fetchWithAuth } = useApi();
+  const user = useAuthStore((state) => state.user);
 
   const handleCreateTask = async (data: Task) => {
     try {
@@ -31,6 +33,7 @@ export function useTaskActions({
         description: data.description,
         dueDate: data.dueDate.toISOString(),
         status: data.status,
+        userId: user?.uid
       };
       
       const newTask = await fetchWithAuth('/api/tasks', {
