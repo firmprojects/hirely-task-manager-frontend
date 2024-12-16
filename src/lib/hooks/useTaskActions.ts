@@ -61,9 +61,8 @@ export function useTaskActions({
       const taskData = {
         title: data.title,
         description: data.description,
-        dueDate: data.dueDate.toISOString().split('T')[0], // Send date only in YYYY-MM-DD format
-        status: data.status || 'PENDING',
-        id: selectedTask.id // Include the ID in the request body
+        dueDate: data.dueDate.toISOString(),
+        status: data.status
       };
 
       console.log('Updating task with data:', {
