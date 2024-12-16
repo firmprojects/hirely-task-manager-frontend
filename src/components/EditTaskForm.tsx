@@ -52,6 +52,7 @@ export function EditTaskForm({
   });
 
   const [status, setStatus] = useState('idle'); // Status state
+  const [errorMessage, setErrorMessage] = useState(''); // Error message state
 
   const handleUpdateTask = async (data: Task) => {
     setStatus('loading'); // Set status to loading
@@ -66,7 +67,9 @@ export function EditTaskForm({
       }, 2000);
     } catch (error) {
       setStatus('error'); // Set status to error
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Failed to update task:', error);
+      setErrorMessage(errorMessage); // Display detailed error message
     }
   };
 
@@ -74,6 +77,7 @@ export function EditTaskForm({
     if (status === 'success' || status === 'error') {
       const timer = setTimeout(() => {
         setStatus('idle'); // Reset status after 3 seconds
+        setErrorMessage(''); // Reset error message after 3 seconds
       }, 3000);
       return () => clearTimeout(timer); // Cleanup the timer
     }
@@ -187,7 +191,7 @@ export function EditTaskForm({
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {status === 'loading' && <p>Updating task...</p>}
             {status === 'success' && <p>Task updated successfully!</p>}
-            {status === 'error' && <p>Failed to update task. Please try again.</p>}
+            {status === 'error' && <p>{errorMessage}</p>}
             Update Task
           </Button>
         </div>
