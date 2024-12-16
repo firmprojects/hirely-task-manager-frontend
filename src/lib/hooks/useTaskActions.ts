@@ -28,10 +28,15 @@ export function useTaskActions({
 
   const handleCreateTask = async (data: Task) => {
     try {
+      console.log('Creating task with data:', data);
+      if (data.dueDate && !(typeof data.dueDate === 'string')) {
+        throw new Error('Due date must be a string in YYYY-MM-DD format');
+      }
+
       const taskData = {
         title: data.title,
         description: data.description,
-        dueDate: data.dueDate.toISOString(),
+        dueDate: data.dueDate,
         status: data.status,
         userId: user?.uid
       };
@@ -41,7 +46,8 @@ export function useTaskActions({
         data: taskData,
       });
       
-      setTasks(prevTasks => [...prevTasks, { ...newTask, dueDate: new Date(newTask.dueDate) }]);
+      console.log('New task response:', newTask);
+      setTasks(prevTasks => [...prevTasks, newTask.task]);
       setIsFormOpen(false);
       toast({
         title: "Task created",
@@ -61,10 +67,14 @@ export function useTaskActions({
     try {
       if (!selectedTask) return;
 
+      if (data.dueDate && !(typeof data.dueDate === 'string')) {
+        throw new Error('Due date must be a string in YYYY-MM-DD format');
+      }
+
       const taskData = {
         title: data.title,
         description: data.description,
-        dueDate: data.dueDate.toISOString(),
+        dueDate: data.dueDate,
         status: data.status
       };
 
@@ -80,7 +90,7 @@ export function useTaskActions({
 
       setTasks(prevTasks =>
         prevTasks.map(task =>
-          task.id === selectedTask.id ? { ...updatedTask, dueDate: new Date(updatedTask.dueDate) } : task
+          task.id === selectedTask.id ? updatedTask.task : task
         )
       );
       

@@ -92,7 +92,7 @@ export function LoginForm() {
           Login with Email
         </Button>
 
-        <div className="relative">
+        {/* <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -101,8 +101,8 @@ export function LoginForm() {
               Or continue with
             </span>
           </div>
-        </div>
-
+        </div> */}
+{/* 
         <Button 
           type="button" 
           variant="outline" 
@@ -112,7 +112,7 @@ export function LoginForm() {
           }}
         >
           Continue with Google
-        </Button>
+        </Button> */}
       </form>
     </Form>
   );

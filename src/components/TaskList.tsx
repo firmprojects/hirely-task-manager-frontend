@@ -50,12 +50,19 @@ const getStatusColor = (status: string) => {
 };
 
 export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
+  console.log('All tasks:', JSON.stringify(tasks, null, 2));
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {tasks.map((task) => {
-        const statusConfig = getStatusConfig(task.status);
+        if (!task || !task.status) {
+          console.error('Invalid task encountered:', task);
+          return null;
+        }
+        console.log('Processing task:', JSON.stringify(task, null, 2));
+        const statusConfig = getStatusConfig(task.status || 'PENDING');
         const StatusIcon = statusConfig.icon;
-        const statusColor = getStatusColor(task.status);
+        const statusColor = getStatusColor(task.status || 'PENDING');
 
         return (
           <Card key={task.id} className="group hover:shadow-lg transition-shadow duration-200">
@@ -72,8 +79,8 @@ export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
               <div className="flex items-center text-sm text-muted-foreground">
                 <CalendarIcon className="h-4 w-4 mr-2" />
                 <span>
-                  {task.dueDate instanceof Date && !isNaN(task.dueDate.getTime())
-                    ? format(task.dueDate, 'PPP')
+                  {task.dueDate && typeof task.dueDate === 'string'
+                    ? format(new Date(task.dueDate), 'MMM d, yyyy')
                     : 'No due date'}
                 </span>
               </div>

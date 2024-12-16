@@ -32,6 +32,7 @@ interface EditTaskFormProps {
   onSubmit: (data: Task) => Promise<void>;
   onCancel: () => void;
   onClose: () => void;
+  onRefresh: () => void;
   isSubmitting: boolean;
 }
 
@@ -40,6 +41,7 @@ export function EditTaskForm({
   onSubmit,
   onCancel,
   onClose,
+  onRefresh,
   isSubmitting,
 }: EditTaskFormProps) {
   const { toast } = useToast();
@@ -48,7 +50,7 @@ export function EditTaskForm({
     defaultValues: {
       title: task.title,
       description: task.description,
-      dueDate: new Date(task.dueDate),
+      dueDate: task.dueDate,
       status: task.status,
     },
   });
@@ -59,6 +61,7 @@ export function EditTaskForm({
     setStatus('loading'); // Set status to loading
     try {
       await onSubmit(data);
+      await onRefresh();
       toast({
         title: "Success",
         description: "Task updated successfully",
@@ -140,8 +143,8 @@ export function EditTaskForm({
                         !field.value && "text-muted-foreground"
                       )}
                     >
-                      {field.value && !isNaN(field.value.getTime()) ? (
-                        format(field.value, "PPP")
+                      {field.value ? (
+                        format(new Date(field.value), 'MMMM d, yyyy')
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -152,8 +155,15 @@ export function EditTaskForm({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
+                    selected={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => {
+                      if (!date) {
+                        field.onChange(null);
+                        return;
+                      }
+                      const formattedDate = format(date, 'yyyy-MM-dd');
+                      field.onChange(formattedDate);
+                    }}
                     disabled={(date) =>
                       date < new Date(new Date().setHours(0, 0, 0, 0))
                     }

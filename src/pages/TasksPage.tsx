@@ -29,6 +29,7 @@ export function TasksPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { fetchWithAuth } = useApi();
@@ -48,11 +49,15 @@ export function TasksPage() {
       console.log('Attempting to fetch tasks...');
       const response = await fetchWithAuth('/api/tasks');
       console.log('Tasks fetched successfully:', response);
-      const formattedTasks = (response.tasks || []).map((task: Task) => ({
-        ...task,
-        dueDate: new Date(task.dueDate)
-      }));
-      setTasks(formattedTasks);
+      if (!response.tasks) {
+        console.error('No tasks array in response:', response);
+        throw new Error('Invalid response format from server');
+      }
+      const validTasks = response.tasks; // Removed validation logic
+      
+      console.log('All tasks:', Array.isArray(validTasks) ? JSON.stringify(validTasks) : 'Tasks is not an array');
+      console.log('Valid tasks before setting state:', validTasks);
+      setTasks(validTasks);
     } catch (error: any) {
       console.error('Failed to fetch tasks:', error);
       setError(error.message || 'Failed to fetch tasks. Please try again.');
@@ -124,7 +129,7 @@ export function TasksPage() {
       </div>
 
       <div className="rounded-md border">
-        {loading ? (
+        {loading || isLoading ? (
           <div className="text-center py-12">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
               <Loader2 className="h-6 w-6 text-muted-foreground animate-spin" />
@@ -172,6 +177,8 @@ export function TasksPage() {
             task={selectedTask}
             onSubmit={handleUpdateTask}
             onCancel={handleEditCancel}
+            onClose={handleEditCancel}
+            onRefresh={loadTasks}
           />
 
           <TaskDetailsDialog

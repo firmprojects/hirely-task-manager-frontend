@@ -10,6 +10,8 @@ interface EditTaskDialogProps {
   task: Task | null;
   onSubmit: (data: Task) => Promise<void>;
   onCancel: () => void;
+  onClose: () => void;
+  onRefresh: () => Promise<void>;
 }
 
 export function EditTaskDialog({
@@ -18,6 +20,8 @@ export function EditTaskDialog({
   task,
   onSubmit,
   onCancel,
+  onClose,
+  onRefresh,
 }: EditTaskDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -25,31 +29,21 @@ export function EditTaskDialog({
   if (!task) return null;
 
   const handleSubmit = async (formData: Task) => {
-    if (!task.id) {
-      toast({
-        title: "Error updating task",
-        description: "Task ID is missing. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsSubmitting(true);
-      await onSubmit({
-        ...formData,
-        id: task.id
-      });
+      await onSubmit(formData);
+      await onRefresh();
       toast({
-        title: 'Task updated successfully',
-        variant: 'default',
+        title: "Success",
+        description: "Task updated successfully",
       });
-    } catch (error) {
-      console.error('Error submitting task:', error);
+      onClose();
+    } catch (error: any) {
+      console.error('Failed to update task:', error);
       toast({
-        title: 'Error updating task',
-        description: error instanceof Error ? error.message : 'An unknown error occurred',
-        variant: 'destructive',
+        title: "Error updating task",
+        description: error.message || "Failed to update task. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -71,6 +65,7 @@ export function EditTaskDialog({
           onSubmit={handleSubmit}
           onCancel={onCancel}
           onClose={handleClose}
+          onRefresh={onRefresh}
           isSubmitting={isSubmitting}
         />
       </DialogContent>

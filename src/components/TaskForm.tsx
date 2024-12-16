@@ -41,14 +41,19 @@ export function TaskForm({
     defaultValues: {
       title: "",
       description: "",
-      dueDate: new Date(),
+      dueDate: null,
       status: "PENDING",
     },
   });
 
+  const handleSubmit = async (data: Task) => {
+    console.log('Form data before submit:', data);
+    await onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -98,7 +103,7 @@ export function TaskForm({
                       )}
                     >
                       {field.value ? (
-                        format(field.value, "PPP")
+                        format(new Date(field.value), 'MMMM d, yyyy')
                       ) : (
                         <span>Pick a date</span>
                       )}
@@ -109,8 +114,22 @@ export function TaskForm({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
+                    selected={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => {
+                      console.log('Selected date:', date);
+                      if (!date) {
+                        field.onChange(null);
+                        return;
+                      }
+                      try {
+                        const formattedDate = format(date, 'yyyy-MM-dd');
+                        console.log('Formatted date:', formattedDate);
+                        field.onChange(formattedDate);
+                      } catch (error) {
+                        console.error('Error formatting date:', error);
+                        field.onChange(null);
+                      }
+                    }}
                     disabled={(date) =>
                       date < new Date(new Date().setHours(0, 0, 0, 0))
                     }
