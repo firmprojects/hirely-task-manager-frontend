@@ -32,11 +32,11 @@ interface EditTaskFormProps {
   isSubmitting: boolean;
 }
 
-export function EditTaskForm({ 
-  task, 
-  onSubmit, 
-  onCancel, 
-  isSubmitting 
+export function EditTaskForm({
+  task,
+  onSubmit,
+  onCancel,
+  isSubmitting,
 }: EditTaskFormProps) {
   const form = useForm<Task>({
     resolver: zodResolver(taskSchema),
@@ -99,7 +99,7 @@ export function EditTaskForm({
                         !field.value && "text-muted-foreground"
                       )}
                     >
-                      {field.value ? (
+                      {field.value && !isNaN(field.value.getTime()) ? (
                         format(field.value, "PPP")
                       ) : (
                         <span>Pick a date</span>
