@@ -33,7 +33,7 @@ export function useTaskActions({
         status: data.status,
       };
       
-      const newTask = await fetchWithAuth('/tasks', {
+      const newTask = await fetchWithAuth('/api/tasks', {
         method: 'POST',
         data: taskData,
       });
