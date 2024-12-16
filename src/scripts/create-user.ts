@@ -12,7 +12,7 @@ async function createUser() {
   };
 
   try {
-    const response = await fetch('https://hirely-task-manager-backend.vercel.app/api/users', {
+    const response = await fetch('https://kelly-task-manager.vercel.app/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
