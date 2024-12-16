@@ -41,7 +41,7 @@ export function useTaskActions({
         data: taskData,
       });
       
-      setTasks(prevTasks => [...prevTasks, newTask]);
+      setTasks(prevTasks => [...prevTasks, { ...newTask, dueDate: new Date(newTask.dueDate) }]);
       setIsFormOpen(false);
       toast({
         title: "Task created",

@@ -71,7 +71,11 @@ export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
               </p>
               <div className="flex items-center text-sm text-muted-foreground">
                 <CalendarIcon className="h-4 w-4 mr-2" />
-                <span>{task.dueDate ? format(new Date(task.dueDate), 'PPP') : 'No due date'}</span>
+                <span>
+                  {task.dueDate instanceof Date && !isNaN(task.dueDate.getTime())
+                    ? format(task.dueDate, 'PPP')
+                    : 'No due date'}
+                </span>
               </div>
             </CardContent>
             <CardFooter className="border-t bg-muted/50 p-3 flex items-center justify-between">

@@ -48,7 +48,11 @@ export function TasksPage() {
       console.log('Attempting to fetch tasks...');
       const response = await fetchWithAuth('/api/tasks');
       console.log('Tasks fetched successfully:', response);
-      setTasks(response.tasks || []);
+      const formattedTasks = (response.tasks || []).map((task: Task) => ({
+        ...task,
+        dueDate: new Date(task.dueDate)
+      }));
+      setTasks(formattedTasks);
     } catch (error: any) {
       console.error('Failed to fetch tasks:', error);
       setError(error.message || 'Failed to fetch tasks. Please try again.');
@@ -135,18 +139,10 @@ export function TasksPage() {
             <h3 className="text-lg font-semibold mb-1 text-destructive">Failed to fetch tasks</h3>
             <p className="text-muted-foreground">{error}</p>
           </div>
-        ) : tasks.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
-              <ListX className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-1">No tasks yet</h3>
-            <p className="text-muted-foreground">Create your first task to get started!</p>
-          </div>
         ) : filteredTasks.length === 0 ? (
           <div className="text-center py-12">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
-              <Search className="h-6 w-6 text-muted-foreground" />
+              <ListX className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold mb-1">No matching tasks</h3>
             <p className="text-muted-foreground">Try adjusting your search query</p>

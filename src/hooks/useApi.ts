@@ -5,8 +5,7 @@ interface FetchOptions extends RequestInit {
   data?: any;
 }
 
-// const API_URL = 'http://localhost:3000';
-const API_URL = 'https://kelly-task-manager.vercel.app';
+const API_URL = 'http://localhost:3000';
 
 export function useApi() {
   const user = useAuthStore((state) => state.user);
