@@ -80,7 +80,7 @@ export function TaskList({ tasks, onEdit, onDelete, onView }: TaskListProps) {
                   "h-4 w-4",
                   task.status === 'COMPLETED' && "text-green-600",
                   task.status === 'IN_PROGRESS' && "text-blue-600",
-                  task.status === 'TODO' && "text-gray-600"
+                  task.status === 'PENDING' && "text-gray-600"
                 )} />
                 <span className="text-sm font-medium text-muted-foreground">
                   {statusConfig.label}
