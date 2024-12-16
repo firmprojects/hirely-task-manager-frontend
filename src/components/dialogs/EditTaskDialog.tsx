@@ -42,7 +42,7 @@ export function EditTaskDialog({
       });
       toast({
         title: 'Task updated successfully',
-        variant: 'success',
+        variant: 'default',
       });
     } catch (error) {
       console.error('Error submitting task:', error);
