@@ -41,15 +41,15 @@ export function EditTaskDialog({
         id: task.id
       });
       toast({
-        title: "Success",
-        description: "Task updated successfully",
+        title: 'Task updated successfully',
+        variant: 'success',
       });
-    } catch (error: any) {
-      console.error('Failed to update task:', error);
+    } catch (error) {
+      console.error('Error submitting task:', error);
       toast({
-        title: "Error updating task",
-        description: error.response?.data?.message || "Failed to update task. Please try again.",
-        variant: "destructive",
+        title: 'Error updating task',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
