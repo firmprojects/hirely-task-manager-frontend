@@ -25,6 +25,7 @@ import { format } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React, { useState, useEffect } from 'react';
+import { useToast } from "@/components/ui/use-toast";
 
 interface EditTaskFormProps {
   task: Task;
@@ -41,6 +42,7 @@ export function EditTaskForm({
   onClose,
   isSubmitting,
 }: EditTaskFormProps) {
+  const { toast } = useToast();
   const form = useForm<Task>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -52,16 +54,17 @@ export function EditTaskForm({
   });
 
   const [status, setStatus] = useState('idle'); // Status state
-  const [errorMessage, setErrorMessage] = useState(''); // Error message state
 
   const handleUpdateTask = async (data: Task) => {
     setStatus('loading'); // Set status to loading
     try {
       await onSubmit(data);
+      toast({
+        title: "Success",
+        description: "Task updated successfully",
+      });
       setStatus('success'); // Set status to success
-      // Reset form fields if needed
       form.reset();
-      // Close modal after a short delay
       setTimeout(() => {
         onClose();
       }, 2000);
@@ -69,7 +72,11 @@ export function EditTaskForm({
       setStatus('error'); // Set status to error
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       console.error('Failed to update task:', error);
-      setErrorMessage(errorMessage); // Display detailed error message
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     }
   };
 
@@ -77,7 +84,6 @@ export function EditTaskForm({
     if (status === 'success' || status === 'error') {
       const timer = setTimeout(() => {
         setStatus('idle'); // Reset status after 3 seconds
-        setErrorMessage(''); // Reset error message after 3 seconds
       }, 3000);
       return () => clearTimeout(timer); // Cleanup the timer
     }
@@ -189,9 +195,6 @@ export function EditTaskForm({
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {status === 'loading' && <p>Updating task...</p>}
-            {status === 'success' && <p>Task updated successfully!</p>}
-            {status === 'error' && <p>{errorMessage}</p>}
             Update Task
           </Button>
         </div>
